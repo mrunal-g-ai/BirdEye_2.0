@@ -21,7 +21,7 @@ services:
       - "8001:8001"
     environment:
       # Use internal Docker DNS block to access the postgres node
-      - PGVECTOR_CONNECTION_STRING=postgresql+psycopg://api:api@pgvector_db:5432/birdeye
+      - PGVECTOR_CONNECTION_STRING=postgresql+psycopg2://api:api@pgvector_db:5432/birdeye
       
       # Use host.docker.internal to escape the container and talk to Windows Ollama instance
       - OLLAMA_BASE_URL=http://host.docker.internal:11434
