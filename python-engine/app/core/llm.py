@@ -1,3 +1,4 @@
+import os
 from langchain_community.chat_models import ChatOllama
 from langchain_community.embeddings import OllamaEmbeddings
 from langchain_core.prompts import PromptTemplate
@@ -7,10 +8,11 @@ class OfflineLLMConnector:
     Handles connections to local, offline inference servers (e.g., Ollama).
     """
 
-    def __init__(self, chat_model: str = "llama3", embed_model: str = "all-minilm", base_url: str = "http://localhost:11434"):
+    def __init__(self, chat_model: str = "llama3", embed_model: str = "all-minilm"):
         self.chat_model = chat_model
         self.embed_model = embed_model
-        self.base_url = base_url
+        # Docker needs host.docker.internal to talk to Windows Ollama
+        self.base_url = os.getenv("OLLAMA_BASE_URL", "http://localhost:11434")
         self._llm = None
         self._embeddings = None
 

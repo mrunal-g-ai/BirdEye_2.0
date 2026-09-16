@@ -1,8 +1,7 @@
 from fastapi import APIRouter, HTTPException
 from typing import Dict, Any
-from app.schemas.domain import CivicIssue, SecurityEvent, LangChainRoutingDecision
+from models import CivicIssue, SecurityEvent, LangChainRoutingDecision
 from app.orchestration.graph import civic_orchestrator_app
-from datetime import datetime
 from pydantic import BaseModel
 
 router = APIRouter(prefix="/v2/ai", tags=["Orchestration Engine"])
@@ -36,18 +35,13 @@ async def process_orchestration(payload: CivicIssue | SecurityEvent):
     config = {"configurable": {"thread_id": f"thread_{payload.record_id}"}}
     
     try:
-        print(f"\n[FASTAPI] --> Passing ID {payload.record_id} to LangGraph State Machine...")
+        print(f"\\n[FASTAPI] --> Passing ID {payload.record_id} to LangGraph State Machine...")
         final_state = await civic_orchestrator_app.ainvoke(initial_state, config=config)
         
-        # Optimization: Safely parse potential Human-In-The-Loop truncated states
         decision_data = final_state.get("final_decision")
-        
         if not decision_data:
             raise ValueError("LangGraph execution completed but produced no decision artifact.")
             
-        # If the graph was paused by the MemorySaver inside the human_approval_queue node, 
-        # it returned a truncated status flag. We must manually expand it to satisfy 
-        # the strict FastAPI LangChainRoutingDecision return schema to avoid a 500 crash.
         if decision_data.get("status") == "AWAITING_HUMAN":
             print(f"[FASTAPI] <-- GRAPH PAUSED: Escrowing ID {payload.record_id} for frontend Human signature.")
             return LangChainRoutingDecision(
@@ -78,7 +72,6 @@ async def resume_paused_graph(record_id: str, payload: HumanOverridePayload):
     config = {"configurable": {"thread_id": f"thread_{record_id}"}}
     
     try:
-        # Fetch the current paused memory footprint
         graph_state = await civic_orchestrator_app.aget_state(config)
         
         if not graph_state or not graph_state.values:
@@ -86,7 +79,6 @@ async def resume_paused_graph(record_id: str, payload: HumanOverridePayload):
             
         print(f"\\n[FASTAPI] --> Human Signature Received for ID {record_id} by {payload.manager_signature}. Unlocking thread...")
         
-        # Optimization 1: Absolute Manual Rejection Logic
         if not payload.approved:
             print(f"[FASTAPI] <-- TICKET REJECTED gracefully by {payload.manager_signature}.")
             return LangChainRoutingDecision(
@@ -100,29 +92,23 @@ async def resume_paused_graph(record_id: str, payload: HumanOverridePayload):
                 human_review_required=False
             )
         
-        # Optimization 2: Comprehensive State Surgery (Handling all overrides)
         state_updates = {
             "human_review_required": False
         }
         
-        # If the manager over-rides the AI's predictions, we surgically inject them into memory
         if payload.override_priority:
             state_updates["priority_assigned"] = payload.override_priority
             
-        # To override the department, we must fetch the existing final_decision dict and modify it
         existing_decision = graph_state.values.get("final_decision", {})
         if payload.override_department:
             existing_decision["assigned_department"] = payload.override_department
             state_updates["final_decision"] = existing_decision
             
-        # Natively update the suspended variables securely within LangGraph MemorySaver
         await civic_orchestrator_app.aupdate_state(config, state_updates, as_node="human_approval_queue")
         
-        # Passing None to ainvoke natively instructs a paused graph to resume execution from the EXACT node it halted at!
         final_state = await civic_orchestrator_app.ainvoke(None, config=config)
         
         decision_data = final_state.get("final_decision", {})
-        
         print(f"[FASTAPI] <-- LangGraph successfully completed Human Override for ID {record_id}")
         return LangChainRoutingDecision(**decision_data)
         

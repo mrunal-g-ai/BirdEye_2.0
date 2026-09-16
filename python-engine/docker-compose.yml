@@ -1,0 +1,33 @@
+version: '3.8'
+
+services:
+  pgvector_db:
+    image: ankane/pgvector
+    container_name: birdeye_vectorstore
+    environment:
+      POSTGRES_USER: api
+      POSTGRES_PASSWORD: api
+      POSTGRES_DB: birdeye
+    ports:
+      - "5432:5432"
+    volumes:
+      - pgvector_data:/var/lib/postgresql/data
+    restart: unless-stopped
+
+  birdeye_api:
+    build: .
+    container_name: birdeye_ai_engine
+    ports:
+      - "8001:8001"
+    environment:
+      # Use internal Docker DNS block to access the postgres node
+      - PGVECTOR_CONNECTION_STRING=postgresql+psycopg2://api:api@pgvector_db:5432/birdeye
+      
+      # Use host.docker.internal to escape the container and talk to Windows Ollama instance
+      - OLLAMA_BASE_URL=http://host.docker.internal:11434
+    depends_on:
+      - pgvector_db
+    restart: unless-stopped
+
+volumes:
+  pgvector_data:
