@@ -27,7 +27,7 @@ urban monitoring, and municipal operations.
 
 <!-- Replace these paths with your uploaded image filenames -->
 
-<img src="team-photo.jpg"
+<img src="team-photo.jpeg"
      width="85%"
      alt="Team RUNTIME at GalxeCode '26 Hackathon"/>
 
