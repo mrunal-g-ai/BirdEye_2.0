@@ -1,4 +1,3 @@
-<<<<<<< HEAD
 # BirdEye 2.0 🦅
 > **Autonomous Smart City Intelligence, Computer-Vision Surveillance & Civic Operations Platform**
 
@@ -8,6 +7,33 @@
 [![Vite](https://img.shields.io/badge/Vite-5.0-646CFF?logo=vite&logoColor=white)](https://vitejs.dev/)
 [![Tailwind CSS](https://img.shields.io/badge/Tailwind-CSS-06B6D4?logo=tailwindcss&logoColor=white)](https://tailwindcss.com/)
 [![License](https://img.shields.io/badge/License-Apache_2.0-blue.svg)](https://opensource.org/licenses/Apache-2.0)
+
+
+---
+
+## 🏆 Hackathon Achievement
+
+<div align="center">
+
+### 🥉 3rd Place — GalxeCode '26 Hackathon
+
+**Project: BirdEye 2.0 | Team RUNTIME**
+
+Recognized for building BirdEye, an AI-powered smart-city
+intelligence platform designed to improve civic issue reporting,
+urban monitoring, and municipal operations.
+
+<br/>
+
+<!-- Replace these paths with your uploaded image filenames -->
+
+<img src="team-photo.jpg"
+     width="85%"
+     alt="Team RUNTIME at GalxeCode '26 Hackathon"/>
+
+
+
+</div>
 
 ---
 
@@ -441,7 +467,7 @@ npm run start
 | **1.0.0** | 2026-08-15 | Core Team | Initial prototype architecture & mock mapping layer |
 | **2.0.0** | 2026-09-01 | Engineering | PostGIS/Haversine deduplication, OSRM routing, and CCTV watchtower |
 | **2.4.0** | 2026-09-12 | AI Systems | Integration of Gemini 3.8 Flash, live spatial copilot radar & edge fallback |
-=======
+
 # BirdEye_2.0_Galaxecode_Hackathon_Winner
 BirdEye is a privacy-first smart-city platform that transforms anonymous citizen reports and real-world data into verified, deduplicated, prioritized civic issues. With AI verification, intelligent routing, geospatial insights, optimized work orders, environmental intelligence, CCTV analytics, and human-reviewed security alerts.
->>>>>>> origin/main
+
